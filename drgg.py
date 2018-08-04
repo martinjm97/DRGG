@@ -17,11 +17,11 @@ class Simulator:
         self.eta = (alpha - 1)*(self.r0)**(alpha - 1) / \
             (1 - (2*self.r0)**(alpha - 1))
 
-    def genPts(self, n0):
+    def generate_points(self, n0):
         """ Sample vertices. """
         return np.random.rand(n0, self.d)
 
-    def genRadii(self, n0):
+    def generate_radii(self, n0):
         """ Obtain the radii of each of the vertices sample. """
 
         def f(x): return (self.r0**(1-self.alpha) -
@@ -29,7 +29,7 @@ class Simulator:
         vf = np.vectorize(f)
         return vf(np.random.rand(n0))
 
-    def dist(self, x, y):
+    def distance(self, x, y):
         """ Compute the pairwise distances. """
         a = abs(x - y)
 
@@ -38,7 +38,7 @@ class Simulator:
         b = vtemp(a)
         return sum(b*b)**0.5
 
-    def adjLists(self, ptList, radList, printer=''):
+    def adjacency_lists(self, ptList, radList, printer=''):
         """ Generate the adjacency lists for indegree and outdegree. """
         result1 = [set() for i in range(len(ptList))]
         result2 = [set() for i in range(len(ptList))]
@@ -47,31 +47,31 @@ class Simulator:
             for outVertex in range(len(ptList)):
                 if inVertex == outVertex:
                     continue
-                if self.dist(ptList[inVertex, :], ptList[outVertex, :]) < radList[inVertex]:
+                if self.distance(ptList[inVertex, :], ptList[outVertex, :]) < radList[inVertex]:
                     result1[inVertex].add(outVertex)
                     result2[outVertex].add(inVertex)
         return (result1, result2)
 
-    def inDegrees(self, inadj):
+    def indegrees(self, inadj):
         """ From the indegree adjacency list produce the indegree distribution"""
         return [len(inadj[i]) for i in range(len(inadj))]
 
-    def outDegrees(self, outadj):
+    def outdegrees(self, outadj):
         """ From the outdegree adjacency list produce the indegree distribution"""
         return [len(outadj[i]) for i in range(len(outadj))]
 
-    def empiricalInOut(self):
+    def empirical_in_out(self):
         """ Find the indegree and outdegree distributions sampling as 
             appropriate.    
         """
-        points = self.genPts(self.n)
-        radii = self.genRadii(self.n)
-        inList, outList = self.adjLists(points, radii)
-        indeg = self.inDegrees(inList)
-        outdeg = self.outDegrees(outList)
+        points = self.generate_points(self.n)
+        radii = self.generate_radii(self.n)
+        inList, outList = self.adjacency_lists(points, radii)
+        indeg = self.indegrees(inList)
+        outdeg = self.outdegrees(outList)
         return (indeg, outdeg)
 
-    def adjMatrix(self, outList):
+    def adjacency_matrix(self, outList):
         """ Produce the adjacency matrix. """
         matrix = np.zeros((self.n, self.n))
         for i in range(self.n):
@@ -81,10 +81,10 @@ class Simulator:
 
     def information(self, printer=''):
         """ Provide overall statistics of the graph produced. """
-        points = self.genPts(self.n)
-        radii = self.genRadii(self.n)
-        inList, outList = self.adjLists(points, radii, printer=printer)
-        matrix = self.adjMatrix(outList)
+        points = self.generate_points(self.n)
+        radii = self.generate_radii(self.n)
+        inList, outList = self.adjacency_lists(points, radii, printer=printer)
+        matrix = self.adjacency_matrix(outList)
         G = nx.from_numpy_matrix(matrix, create_using=nx.DiGraph())
         H = G.to_undirected()
         if nx.is_strongly_connected(G):
@@ -133,16 +133,16 @@ class Simulator:
             plt.plot(x, first, 'r', second, 'b')
             plt.show()
 
-    def concatEmpirical(self):
+    def concat_empirical(self):
         resultIn = []
         resultOut = []
         for k in range(repl):
-            intemp, outtemp = empiricalInOut()
+            intemp, outtemp = empirical_in_out()
             resultIn.extend(intemp)
             resultOut.extend(outtemp)
         return (resultIn, resultOut)
 
-    def theoreticalOut(self):
+    def theoretical_out(self):
         """ The expected outdegree distribution with the theoretical model. """
         z = eta*V(d)/(d - alpha + 1) * \
             (1/2.0**(d-alpha + 1) - r0**(d-alpha + 1))
