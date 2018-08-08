@@ -3,7 +3,7 @@
 We provide the data and implementations that were used to evaluate the practical applications of the DRGG model. Our example used is from a word ascociation study. We also found other data sets such as http://vlado.fmf.uni-lj.si/pub/networks/data/dic/fa/FreeAssoc.htm.
 
 ## To Use
-Download PairsP.net from http://vlado.fmf.uni-lj.si/pub/networks/data/dic/fa/FreeAssoc.htm and add it to the cloned repo. One may start by running theoretical_degree_distribution.py to reproduce some of the graphs given in the paper. 
+Download PairsP.net from http://vlado.fmf.uni-lj.si/pub/networks/data/dic/fa/FreeAssoc.htm and add it to the cloned repo. One may start by running theoretical_degree_distribution.py to reproduce some of the graphs given in [the paper](https://arxiv.org/abs/1808.02046). 
 
 ## Contents
 - drgg.py a class that allows for the production of graphs following the DRGG model.
