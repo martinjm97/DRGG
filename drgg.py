@@ -2,6 +2,7 @@ import numpy as np
 from scipy import special
 import matplotlib.pyplot as plt
 import networkx as nx
+from tqdm import tqdm
 
 feat = ['n', 'alpha', 'd', 'edges/nlogn', 'dist/logn',
         'diameter/logn', 'triangles', 'clustering']
@@ -22,7 +23,7 @@ class Simulator:
         return np.random.rand(n0, self.d)
 
     def generate_radii(self, n0):
-        """ Obtain the radii of each of the vertices sample. """
+        """ Obtain the radii of each of the vertices sampled. """
 
         def f(x): return (self.r0**(1-self.alpha) -
                           ((self.alpha - 1)*x/(self.eta)))**(1.0/(1-self.alpha))
@@ -38,12 +39,13 @@ class Simulator:
         b = vtemp(a)
         return sum(b*b)**0.5
 
-    def adjacency_lists(self, ptList, radList, printer=''):
+    def adjacency_lists(self, ptList, radList, verbose=False):
         """ Generate the adjacency lists for indegree and outdegree. """
         result1 = [set() for i in range(len(ptList))]
         result2 = [set() for i in range(len(ptList))]
-        for inVertex in range(len(ptList)):
-            print(printer, str(100*(inVertex+1)/len(ptList))+'%', end='\r')
+        if verbose:
+            print("Creating adjacency lists. ")
+        for inVertex in tqdm(range(len(ptList)), disable=not verbose):
             for outVertex in range(len(ptList)):
                 if inVertex == outVertex:
                     continue
@@ -71,19 +73,21 @@ class Simulator:
         outdeg = self.outdegrees(outList)
         return (indeg, outdeg)
 
-    def adjacency_matrix(self, outList):
+    def adjacency_matrix(self, outList, verbose=False):
         """ Produce the adjacency matrix. """
         matrix = np.zeros((self.n, self.n))
-        for i in range(self.n):
+        if verbose:
+            print("Creating adjacency matrix. ")
+        for i in tqdm(range(self.n), disable=not verbose):
             for j in outList[i]:
                 matrix[i][j] = 1
         return matrix
 
-    def information(self, printer=''):
+    def information(self, verbose=True):
         """ Provide overall statistics of the graph produced. """
         points = self.generate_points(self.n)
         radii = self.generate_radii(self.n)
-        inList, outList = self.adjacency_lists(points, radii, printer=printer)
+        inList, outList = self.adjacency_lists(points, radii, verbose)
         matrix = self.adjacency_matrix(outList)
         G = nx.from_numpy_matrix(matrix, create_using=nx.DiGraph())
         H = G.to_undirected()

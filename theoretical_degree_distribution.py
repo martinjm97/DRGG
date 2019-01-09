@@ -71,13 +71,14 @@ def create_plot(exact, apx, n):
     start = 5
     index = range(start, len(exact[:n]))
     axis_font = {'size': '16'}
-    a, = plt.plot(index, exact[start:n], '.', color='r')
-    b, = plt.plot(index, apx[start:n], '-', color='black')
+    a, = plt.plot(np.log(index), np.log(exact[start:n]), '.', color='r')
+    b, = plt.plot(np.log(index), np.log([float(i) for i in apx[start:n]]), '-', color='black')
     plt.rcParams.update({'font.size': 16})
-    plt.xlabel('Indegree', axis_font)
-    plt.ylabel('Probability', axis_font)
+    plt.xlabel('Log indegree', axis_font)
+    plt.ylabel('Log probability', axis_font)
     plt.title('Indegree distribution for {} Nodes'.format(n))
     plt.legend([a, b], ['Exact', 'Approximation'])
+    # plt.savefig('{}nodeindeg.eps'.format(n), format='eps', dpi=1000)
     plt.show()
 
 
